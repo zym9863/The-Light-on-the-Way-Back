@@ -458,5 +458,24 @@
     </div>
     
     {% block extra_js %}{% endblock %}
-</body>
+    <script>
+    // 初始化把 data-text 写入到 .typewriter-text 的可见文本中
+    (function () {
+      function initTypewriterText(root) {
+        var nodes = (root || document).querySelectorAll('.typewriter-text');
+        nodes.forEach(function (el) {
+          var text = el.getAttribute('data-text') || '';
+          if (!el.textContent || !el.textContent.trim()) {
+            el.textContent = text;
+          }
+        });
+      }
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', function () { initTypewriterText(document); });
+      } else {
+        initTypewriterText(document);
+      }
+    })();
+    </script>
+  </body>
 </html>
