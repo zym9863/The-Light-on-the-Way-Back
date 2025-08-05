@@ -3,97 +3,757 @@
 {% block title %}时光信笺 - 归途的光{% endblock %}
 
 {% block content %}
-<div class="card">
-    <h2 style="text-align: center; margin-bottom: 30px; color: #ffd700;">时光信笺</h2>
+<div class="card letter-form-card">
+    <h2 style="text-align: center; margin-bottom: 30px; color: #ffd700; position: relative;">
+        时光信笺
+        <span class="title-decoration"></span>
+    </h2>
     
-    <div class="poetry">
-        "许便宜糕点的愿望"<br>
-        "撒闭眼前想好的谎"<br>
-        "将心事封存在时光的胶囊里"
+    <div class="poetry enhanced-poetry">
+        <span class="poetry-line">"许便宜糕点的愿望"</span><br>
+        <span class="poetry-line" style="animation-delay: 1s;">"撒闭眼前想好的谎"</span><br>
+        <span class="poetry-line" style="animation-delay: 2s;">"将心事封存在时光的胶囊里"</span>
     </div>
     
-    <form id="letterForm" method="post" action="/time-capsule/create">
-        <div class="form-group">
-            <label for="title">信笺标题（可选）</label>
-            <input type="text" id="title" name="title" placeholder="给这封信起个标题..." maxlength="100">
-        </div>
-        
-        <div class="form-group">
-            <label for="content">信笺内容 *</label>
-            <textarea id="content" name="content" rows="10" placeholder="写下你想对未来说的话..." required maxlength="5000"></textarea>
-            <small style="color: rgba(240, 240, 240, 0.6);">还可以输入 <span id="charCount">5000</span> 个字符</small>
-        </div>
-        
-        <div class="form-group">
-            <label for="openDate">开启日期 *</label>
-            <input type="datetime-local" id="openDate" name="open_date" required>
-            <small style="color: rgba(240, 240, 240, 0.6);">选择你希望这封信被开启的日期和时间</small>
-        </div>
-        
-        <div class="form-group">
-            <label style="display: flex; align-items: center; cursor: pointer;">
-                <input type="checkbox" id="sendToVoid" name="send_to_void" style="margin-right: 10px;">
-                寄往虚空（创建后立即销毁，作为纯粹的情感宣泄）
+    <form id="letterForm" method="post" action="/time-capsule/create" class="enhanced-form">
+        <div class="form-group animated-form-group">
+            <label for="title" class="form-label">
+                <span class="label-icon">✨</span>
+                信笺标题（可选）
             </label>
-            <small style="color: rgba(240, 240, 240, 0.6); margin-left: 25px;">
+            <input type="text" id="title" name="title" placeholder="给这封信起个标题..." maxlength="100" class="enhanced-input">
+        </div>
+        
+        <div class="form-group animated-form-group">
+            <label for="content" class="form-label required">
+                <span class="label-icon">📝</span>
+                信笺内容 *
+            </label>
+            <textarea id="content" name="content" rows="10" placeholder="写下你想对未来说的话..." required maxlength="5000" class="enhanced-textarea"></textarea>
+            <div class="char-counter">
+                <small>还可以输入 <span id="charCount" class="char-count">5000</span> 个字符</small>
+                <div class="char-progress">
+                    <div class="char-progress-bar" id="charProgressBar"></div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="form-group animated-form-group">
+            <label for="openDate" class="form-label required">
+                <span class="label-icon">⏰</span>
+                开启日期 *
+            </label>
+            <input type="datetime-local" id="openDate" name="open_date" required class="enhanced-input">
+            <small class="form-hint">选择你希望这封信被开启的日期和时间</small>
+        </div>
+        
+        <div class="form-group animated-form-group">
+            <label class="checkbox-container">
+                <input type="checkbox" id="sendToVoid" name="send_to_void" class="enhanced-checkbox">
+                <span class="checkmark"></span>
+                <span class="checkbox-label">
+                    <span class="label-icon">🌌</span>
+                    寄往虚空（创建后立即销毁，作为纯粹的情感宣泄）
+                </span>
+            </label>
+            <small class="form-hint void-hint">
                 "哭一场 缓解点疯狂" - 选择此项后，信笺将在创建后立即被销毁
             </small>
         </div>
         
-        <div style="text-align: center; margin-top: 30px;">
-            <button type="submit" class="btn">封存信笺</button>
+        <div class="form-submit">
+            <button type="submit" class="btn enhanced-submit-btn">
+                <span class="btn-icon">🔒</span>
+                <span class="btn-text">封存信笺</span>
+                <span class="btn-loading">
+                    <span class="loading-dot"></span>
+                    <span class="loading-dot"></span>
+                    <span class="loading-dot"></span>
+                </span>
+            </button>
         </div>
     </form>
 </div>
 
-<div class="card">
-    <h3 style="color: #ffd700; margin-bottom: 20px; text-align: center;">可开启的信笺</h3>
+<div class="card letters-list-card">
+    <h3 style="color: #ffd700; margin-bottom: 20px; text-align: center; position: relative;">
+        可开启的信笺
+        <span class="letters-count">{{ openable_letters|length if openable_letters else 0 }} 封</span>
+    </h3>
     
-    <div id="openableLetters">
+    <div id="openableLetters" class="letters-container">
         {% if openable_letters %}
             {% for letter in openable_letters %}
-            <div class="letter-item" style="background: rgba(255, 255, 255, 0.05); padding: 20px; margin-bottom: 15px; border-radius: 10px; border-left: 4px solid #ffd700;">
-                <div style="display: flex; justify-content: between; align-items: center;">
-                    <div>
-                        <p><strong>创建时间：</strong>{{ letter.created_at.strftime('%Y-%m-%d %H:%M') }}</p>
-                        <p><strong>开启时间：</strong>{{ letter.open_at.strftime('%Y-%m-%d %H:%M') }}</p>
+            <div class="letter-item" data-letter-id="{{ letter.id }}">
+                <div class="letter-header">
+                    <div class="letter-info">
+                        <div class="letter-detail">
+                            <span class="detail-label">创建时间：</span>
+                            <span class="detail-value">{{ letter.created_at.strftime('%Y-%m-%d %H:%M') }}</span>
+                        </div>
+                        <div class="letter-detail">
+                            <span class="detail-label">开启时间：</span>
+                            <span class="detail-value">{{ letter.open_at.strftime('%Y-%m-%d %H:%M') }}</span>
+                        </div>
                     </div>
-                    <button onclick="openLetter({{ letter.id }})" class="btn">开启信笺</button>
+                    <button onclick="openLetter({{ letter.id }})" class="btn letter-open-btn">
+                        <span class="btn-icon">🔓</span>
+                        开启信笺
+                    </button>
+                </div>
+                <div class="letter-preview">
+                    {% if letter.title %}
+                        <div class="letter-title-preview">{{ letter.title[:20] }}{% if letter.title|length > 20 %}...{% endif %}</div>
+                    {% endif %}
+                    <div class="letter-meta">
+                        <span class="letter-status">等待开启</span>
+                    </div>
                 </div>
             </div>
             {% endfor %}
         {% else %}
-            <p style="text-align: center; opacity: 0.7;">暂无可开启的信笺</p>
+            <div class="empty-state">
+                <div class="empty-icon">📭</div>
+                <p>暂无可开启的信笺</p>
+                <small>写一封信给未来的自己吧</small>
+            </div>
         {% endif %}
     </div>
 </div>
 
-<!-- 信笺内容模态框 -->
-<div id="letterModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.8); z-index: 1000;">
-    <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%); padding: 40px; border-radius: 15px; max-width: 600px; width: 90%; max-height: 80%; overflow-y: auto;">
-        <h3 style="color: #ffd700; margin-bottom: 20px; text-align: center;">时光信笺</h3>
-        <div id="letterContent"></div>
-        <div style="text-align: center; margin-top: 30px;">
-            <button onclick="closeModal()" class="btn">关闭</button>
+<!-- 增强的信笺内容模态框 -->
+<div id="letterModal" class="modal-overlay">
+    <div class="modal-container">
+        <div class="modal-header">
+            <h3 class="modal-title">时光信笺</h3>
+            <button onclick="closeModal()" class="modal-close">×</button>
+        </div>
+        <div class="modal-body">
+            <div id="letterContent" class="letter-content"></div>
+        </div>
+        <div class="modal-footer">
+            <button onclick="closeModal()" class="btn modal-btn">关闭</button>
         </div>
     </div>
 </div>
 
 {% endblock %}
 
+{% block extra_css %}
+<style>
+.letter-form-card {
+    position: relative;
+    overflow: visible;
+}
+
+.title-decoration {
+    position: absolute;
+    bottom: -8px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 60px;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, #ffd700, transparent);
+    animation: titleGlow 2s ease-in-out infinite;
+}
+
+.enhanced-poetry {
+    background: linear-gradient(135deg, rgba(255, 215, 0, 0.1), rgba(255, 237, 78, 0.05));
+    border: 1px solid rgba(255, 215, 0, 0.3);
+    position: relative;
+    overflow: hidden;
+}
+
+.enhanced-poetry::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 215, 0, 0.1), transparent);
+    animation: poetryShimmer 3s ease-in-out infinite;
+}
+
+@keyframes poetryShimmer {
+    0% { left: -100%; }
+    100% { left: 100%; }
+}
+
+.poetry-line {
+    display: inline-block;
+    opacity: 0;
+    animation: fadeInPoetry 1s ease-out forwards;
+}
+
+@keyframes fadeInPoetry {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.enhanced-form {
+    position: relative;
+}
+
+.animated-form-group {
+    opacity: 0;
+    animation: slideInForm 0.6s ease-out forwards;
+}
+
+.animated-form-group:nth-child(1) { animation-delay: 0.1s; }
+.animated-form-group:nth-child(2) { animation-delay: 0.2s; }
+.animated-form-group:nth-child(3) { animation-delay: 0.3s; }
+.animated-form-group:nth-child(4) { animation-delay: 0.4s; }
+.animated-form-group:nth-child(5) { animation-delay: 0.5s; }
+
+@keyframes slideInForm {
+    from {
+        opacity: 0;
+        transform: translateX(-30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+.form-label {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+    font-weight: bold;
+    color: #ffed4e;
+    transition: all 0.3s ease;
+}
+
+.form-label.required::after {
+    content: '';
+    width: 6px;
+    height: 6px;
+    background: #ff6b6b;
+    border-radius: 50%;
+    margin-left: 5px;
+    animation: pulse 2s ease-in-out infinite;
+}
+
+.label-icon {
+    margin-right: 8px;
+    font-size: 1.1em;
+    transition: transform 0.3s ease;
+}
+
+.form-group:hover .label-icon {
+    transform: scale(1.2) rotate(5deg);
+}
+
+.enhanced-input,
+.enhanced-textarea {
+    width: 100%;
+    padding: 18px;
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    border-radius: 15px;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    color: #f0f0f0;
+    font-size: 1rem;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    resize: vertical;
+    position: relative;
+}
+
+.enhanced-input:focus,
+.enhanced-textarea:focus {
+    outline: none;
+    border-color: #ffd700;
+    background: rgba(255, 255, 255, 0.15);
+    box-shadow: 
+        0 0 20px rgba(255, 215, 0, 0.3),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    transform: translateY(-3px);
+}
+
+.enhanced-input::placeholder,
+.enhanced-textarea::placeholder {
+    color: rgba(240, 240, 240, 0.6);
+    transition: color 0.3s ease;
+}
+
+.enhanced-input:focus::placeholder,
+.enhanced-textarea:focus::placeholder {
+    color: rgba(255, 215, 0, 0.7);
+}
+
+.char-counter {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 8px;
+}
+
+.char-count {
+    font-weight: bold;
+    transition: color 0.3s ease;
+}
+
+.char-progress {
+    width: 100px;
+    height: 4px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 2px;
+    overflow: hidden;
+}
+
+.char-progress-bar {
+    height: 100%;
+    background: linear-gradient(90deg, #4ade80, #ffd700, #f87171);
+    width: 0%;
+    transition: width 0.3s ease;
+    border-radius: 2px;
+}
+
+.form-hint {
+    display: block;
+    margin-top: 5px;
+    color: rgba(240, 240, 240, 0.6);
+    font-size: 0.9rem;
+    transition: color 0.3s ease;
+}
+
+.checkbox-container {
+    display: flex;
+    align-items: flex-start;
+    cursor: pointer;
+    position: relative;
+    padding-left: 35px;
+    font-size: 1rem;
+    user-select: none;
+    transition: all 0.3s ease;
+}
+
+.checkbox-container:hover {
+    color: #ffd700;
+}
+
+.enhanced-checkbox {
+    position: absolute;
+    opacity: 0;
+    cursor: pointer;
+    height: 0;
+    width: 0;
+}
+
+.checkmark {
+    position: absolute;
+    top: 2px;
+    left: 0;
+    height: 20px;
+    width: 20px;
+    background: rgba(255, 255, 255, 0.1);
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-radius: 6px;
+    transition: all 0.3s ease;
+}
+
+.checkbox-container:hover .checkmark {
+    border-color: #ffd700;
+    background: rgba(255, 215, 0, 0.1);
+}
+
+.enhanced-checkbox:checked ~ .checkmark {
+    background: linear-gradient(45deg, #ffd700, #ffed4e);
+    border-color: #ffd700;
+}
+
+.checkmark:after {
+    content: "";
+    position: absolute;
+    display: none;
+}
+
+.enhanced-checkbox:checked ~ .checkmark:after {
+    display: block;
+}
+
+.checkbox-container .checkmark:after {
+    left: 6px;
+    top: 2px;
+    width: 6px;
+    height: 10px;
+    border: solid #1e3c72;
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+}
+
+.checkbox-label {
+    display: flex;
+    align-items: center;
+}
+
+.void-hint {
+    margin-left: 35px;
+    font-style: italic;
+    color: rgba(255, 215, 0, 0.7);
+}
+
+.form-submit {
+    text-align: center;
+    margin-top: 30px;
+}
+
+.enhanced-submit-btn {
+    position: relative;
+    overflow: hidden;
+    min-width: 160px;
+}
+
+.enhanced-submit-btn .btn-loading {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    display: none;
+}
+
+.enhanced-submit-btn.loading .btn-text,
+.enhanced-submit-btn.loading .btn-icon {
+    opacity: 0;
+}
+
+.enhanced-submit-btn.loading .btn-loading {
+    display: flex;
+    gap: 4px;
+}
+
+.loading-dot {
+    width: 6px;
+    height: 6px;
+    background: #1e3c72;
+    border-radius: 50%;
+    animation: loadingDots 1.4s ease-in-out infinite both;
+}
+
+.loading-dot:nth-child(1) { animation-delay: -0.32s; }
+.loading-dot:nth-child(2) { animation-delay: -0.16s; }
+
+@keyframes loadingDots {
+    0%, 80%, 100% { transform: scale(0); }
+    40% { transform: scale(1); }
+}
+
+.letters-list-card {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.08), rgba(255, 215, 0, 0.03));
+}
+
+.letters-count {
+    position: absolute;
+    right: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(255, 215, 0, 0.2);
+    padding: 4px 12px;
+    border-radius: 15px;
+    font-size: 0.8rem;
+    border: 1px solid rgba(255, 215, 0, 0.3);
+}
+
+.letters-container {
+    max-height: 500px;
+    overflow-y: auto;
+    padding-right: 10px;
+}
+
+.letter-item {
+    background: rgba(255, 255, 255, 0.05);
+    padding: 25px;
+    margin-bottom: 15px;
+    border-radius: 15px;
+    border-left: 4px solid #ffd700;
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    position: relative;
+    overflow: hidden;
+}
+
+.letter-item::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(45deg, transparent, rgba(255, 215, 0, 0.02), transparent);
+    transform: translateX(-100%);
+    transition: transform 0.6s ease;
+}
+
+.letter-item:hover::before {
+    transform: translateX(100%);
+}
+
+.letter-item:hover {
+    background: rgba(255, 255, 255, 0.08);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+}
+
+.letter-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.letter-info {
+    flex: 1;
+}
+
+.letter-detail {
+    margin-bottom: 5px;
+}
+
+.detail-label {
+    font-weight: bold;
+    color: #ffed4e;
+}
+
+.detail-value {
+    color: #f0f0f0;
+    margin-left: 5px;
+}
+
+.letter-open-btn {
+    font-size: 0.9rem;
+    padding: 8px 16px;
+    min-width: auto;
+}
+
+.letter-preview {
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    padding-top: 15px;
+}
+
+.letter-title-preview {
+    font-weight: bold;
+    color: #ffd700;
+    margin-bottom: 8px;
+}
+
+.letter-status {
+    font-size: 0.8rem;
+    color: rgba(240, 240, 240, 0.7);
+    background: rgba(255, 215, 0, 0.1);
+    padding: 2px 8px;
+    border-radius: 10px;
+}
+
+.empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    opacity: 0.7;
+}
+
+.empty-icon {
+    font-size: 4rem;
+    margin-bottom: 20px;
+    animation: float 3s ease-in-out infinite;
+}
+
+@keyframes float {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-10px); }
+}
+
+/* 模态框样式 */
+.modal-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(5px);
+    z-index: 1000;
+    animation: fadeIn 0.3s ease-out;
+}
+
+.modal-container {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+    border-radius: 20px;
+    max-width: 600px;
+    width: 90%;
+    max-height: 80%;
+    overflow: hidden;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+    animation: modalSlideIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes modalSlideIn {
+    from {
+        opacity: 0;
+        transform: translate(-50%, -60%) scale(0.8);
+    }
+    to {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1);
+    }
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 25px 30px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.modal-title {
+    color: #ffd700;
+    margin: 0;
+    font-size: 1.5rem;
+}
+
+.modal-close {
+    background: none;
+    border: none;
+    color: #f0f0f0;
+    font-size: 2rem;
+    cursor: pointer;
+    padding: 0;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: all 0.3s ease;
+}
+
+.modal-close:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: #ffd700;
+    transform: rotate(90deg);
+}
+
+.modal-body {
+    padding: 30px;
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.letter-content {
+    line-height: 1.8;
+}
+
+.letter-content h4 {
+    color: #ffed4e;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid rgba(255, 215, 0, 0.3);
+}
+
+.letter-content .content-box {
+    background: rgba(255, 255, 255, 0.1);
+    padding: 25px;
+    border-radius: 15px;
+    margin: 20px 0;
+    border-left: 4px solid #ffd700;
+}
+
+.letter-content .content-box pre {
+    white-space: pre-wrap;
+    font-family: inherit;
+    margin: 0;
+    line-height: 1.6;
+}
+
+.letter-content .meta-info {
+    text-align: center;
+    opacity: 0.7;
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.modal-footer {
+    padding: 20px 30px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    text-align: center;
+    background: rgba(255, 255, 255, 0.03);
+}
+
+.modal-btn {
+    background: rgba(255, 255, 255, 0.1);
+    color: #f0f0f0;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.modal-btn:hover {
+    background: rgba(255, 215, 0, 0.2);
+    border-color: #ffd700;
+    color: #ffd700;
+}
+
+@media (max-width: 768px) {
+    .letter-header {
+        flex-direction: column;
+        gap: 15px;
+        align-items: flex-start;
+    }
+    
+    .letters-count {
+        position: static;
+        transform: none;
+        margin-left: 10px;
+    }
+    
+    .modal-container {
+        width: 95%;
+        max-height: 90%;
+    }
+    
+    .enhanced-input,
+    .enhanced-textarea {
+        padding: 15px;
+    }
+}
+</style>
+{% endblock %}
+
 {% block extra_js %}
 <script>
-// 字符计数
+// 增强的字符计数功能
 document.getElementById('content').addEventListener('input', function() {
     const maxLength = 5000;
     const currentLength = this.value.length;
     const remaining = maxLength - currentLength;
+    const percentage = (currentLength / maxLength) * 100;
+    
     document.getElementById('charCount').textContent = remaining;
+    document.getElementById('charProgressBar').style.width = percentage + '%';
+    
+    const charCountElement = document.getElementById('charCount');
+    const progressBar = document.getElementById('charProgressBar');
     
     if (remaining < 100) {
-        document.getElementById('charCount').style.color = '#ff6b6b';
+        charCountElement.style.color = '#f87171';
+        progressBar.style.background = '#f87171';
+    } else if (remaining < 500) {
+        charCountElement.style.color = '#ffd700';
+        progressBar.style.background = '#ffd700';
     } else {
-        document.getElementById('charCount').style.color = 'rgba(240, 240, 240, 0.6)';
+        charCountElement.style.color = 'rgba(240, 240, 240, 0.6)';
+        progressBar.style.background = 'linear-gradient(90deg, #4ade80, #ffd700, #f87171)';
     }
 });
 
@@ -102,22 +762,112 @@ document.addEventListener('DOMContentLoaded', function() {
     const now = new Date();
     now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
     document.getElementById('openDate').min = now.toISOString().slice(0, 16);
+    
+    // 添加动态时间建议
+    const openDateField = document.getElementById('openDate');
+    const suggestions = [
+        { days: 7, label: '一周后' },
+        { days: 30, label: '一个月后' },
+        { days: 365, label: '一年后' }
+    ];
+    
+    // 创建时间建议按钮
+    const suggestionsContainer = document.createElement('div');
+    suggestionsContainer.className = 'time-suggestions';
+    suggestionsContainer.style.cssText = `
+        display: flex;
+        gap: 10px;
+        margin-top: 10px;
+        flex-wrap: wrap;
+    `;
+    
+    suggestions.forEach(suggestion => {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.textContent = suggestion.label;
+        btn.className = 'time-suggestion-btn';
+        btn.style.cssText = `
+            background: rgba(255, 215, 0, 0.1);
+            border: 1px solid rgba(255, 215, 0, 0.3);
+            color: #ffd700;
+            padding: 6px 12px;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        `;
+        
+        btn.addEventListener('mouseenter', function() {
+            this.style.background = 'rgba(255, 215, 0, 0.2)';
+            this.style.borderColor = '#ffd700';
+        });
+        
+        btn.addEventListener('mouseleave', function() {
+            this.style.background = 'rgba(255, 215, 0, 0.1)';
+            this.style.borderColor = 'rgba(255, 215, 0, 0.3)';
+        });
+        
+        btn.addEventListener('click', function() {
+            const futureDate = new Date();
+            futureDate.setDate(futureDate.getDate() + suggestion.days);
+            futureDate.setMinutes(futureDate.getMinutes() - futureDate.getTimezoneOffset());
+            openDateField.value = futureDate.toISOString().slice(0, 16);
+            
+            // 添加选中效果
+            document.querySelectorAll('.time-suggestion-btn').forEach(b => {
+                b.style.background = 'rgba(255, 215, 0, 0.1)';
+                b.style.borderColor = 'rgba(255, 215, 0, 0.3)';
+            });
+            this.style.background = 'rgba(255, 215, 0, 0.3)';
+            this.style.borderColor = '#ffd700';
+        });
+        
+        suggestionsContainer.appendChild(btn);
+    });
+    
+    openDateField.parentNode.insertBefore(suggestionsContainer, openDateField.nextSibling);
 });
 
 // 寄往虚空选项处理
 document.getElementById('sendToVoid').addEventListener('change', function() {
     const openDateField = document.getElementById('openDate');
+    const suggestionsContainer = document.querySelector('.time-suggestions');
+    
     if (this.checked) {
         openDateField.disabled = true;
         openDateField.required = false;
+        openDateField.style.opacity = '0.5';
+        if (suggestionsContainer) suggestionsContainer.style.display = 'none';
     } else {
         openDateField.disabled = false;
         openDateField.required = true;
+        openDateField.style.opacity = '1';
+        if (suggestionsContainer) suggestionsContainer.style.display = 'flex';
     }
+});
+
+// 增强的表单提交
+document.getElementById('letterForm').addEventListener('submit', function() {
+    const submitBtn = this.querySelector('.enhanced-submit-btn');
+    submitBtn.classList.add('loading');
+    submitBtn.disabled = true;
+    
+    // 如果提交失败，重置按钮状态
+    setTimeout(() => {
+        submitBtn.classList.remove('loading');
+        submitBtn.disabled = false;
+    }, 5000);
 });
 
 // 开启信笺
 async function openLetter(letterId) {
+    const letterItem = document.querySelector(`[data-letter-id="${letterId}"]`);
+    const openBtn = letterItem.querySelector('.letter-open-btn');
+    
+    // 添加加载状态
+    openBtn.innerHTML = '<span class="btn-icon">⏳</span> 正在开启...';
+    openBtn.disabled = true;
+    
     try {
         const response = await fetch(`/time-capsule/open/${letterId}`, {
             method: 'POST'
@@ -126,35 +876,55 @@ async function openLetter(letterId) {
         if (response.ok) {
             const data = await response.json();
             showLetterContent(data);
+            
+            // 添加开启成功的动画效果
+            letterItem.style.animation = 'letterOpenSuccess 0.6s ease-out';
+            setTimeout(() => {
+                letterItem.remove();
+            }, 600);
         } else {
             const error = await response.json();
-            alert('开启失败: ' + error.detail);
+            showNotification('开启失败: ' + error.detail, 'error');
         }
     } catch (error) {
-        alert('开启失败: ' + error.message);
+        showNotification('开启失败: ' + error.message, 'error');
+    } finally {
+        openBtn.innerHTML = '<span class="btn-icon">🔓</span> 开启信笺';
+        openBtn.disabled = false;
     }
 }
 
 // 显示信笺内容
 function showLetterContent(data) {
     const content = `
-        ${data.title ? `<h4 style="color: #ffed4e; margin-bottom: 15px;">${data.title}</h4>` : ''}
-        <div style="background: rgba(255, 255, 255, 0.1); padding: 20px; border-radius: 10px; margin-bottom: 20px;">
-            <pre style="white-space: pre-wrap; font-family: inherit; margin: 0;">${data.content}</pre>
+        ${data.title ? `<h4>${data.title}</h4>` : ''}
+        <div class="content-box">
+            <pre>${data.content}</pre>
         </div>
-        <p style="text-align: center; opacity: 0.7;">
+        <div class="meta-info">
             <small>创建于 ${new Date(data.created_at).toLocaleString()}</small><br>
             <small>开启于 ${new Date(data.opened_at).toLocaleString()}</small>
-        </p>
+        </div>
     `;
     
     document.getElementById('letterContent').innerHTML = content;
     document.getElementById('letterModal').style.display = 'block';
+    
+    // 添加打开动画
+    const modalContainer = document.querySelector('.modal-container');
+    modalContainer.style.animation = 'modalSlideIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
 }
 
 // 关闭模态框
 function closeModal() {
-    document.getElementById('letterModal').style.display = 'none';
+    const modal = document.getElementById('letterModal');
+    const modalContainer = document.querySelector('.modal-container');
+    
+    modalContainer.style.animation = 'modalSlideOut 0.3s ease-in';
+    setTimeout(() => {
+        modal.style.display = 'none';
+        modalContainer.style.animation = '';
+    }, 300);
 }
 
 // 点击模态框外部关闭
@@ -163,5 +933,91 @@ document.getElementById('letterModal').addEventListener('click', function(e) {
         closeModal();
     }
 });
+
+// ESC键关闭模态框
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape' && document.getElementById('letterModal').style.display === 'block') {
+        closeModal();
+    }
+});
+
+// 通知系统
+function showNotification(message, type = 'info') {
+    const notification = document.createElement('div');
+    notification.className = `notification notification-${type}`;
+    notification.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: ${type === 'error' ? 'rgba(248, 113, 113, 0.9)' : 'rgba(255, 215, 0, 0.9)'};
+        color: ${type === 'error' ? '#7f1d1d' : '#1e3c72'};
+        padding: 15px 20px;
+        border-radius: 10px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        backdrop-filter: blur(10px);
+        z-index: 10000;
+        animation: notificationSlideIn 0.3s ease-out;
+        max-width: 300px;
+        word-wrap: break-word;
+    `;
+    notification.textContent = message;
+    
+    document.body.appendChild(notification);
+    
+    setTimeout(() => {
+        notification.style.animation = 'notificationSlideOut 0.3s ease-in';
+        setTimeout(() => {
+            if (notification.parentNode) {
+                notification.parentNode.removeChild(notification);
+            }
+        }, 300);
+    }, 3000);
+}
+
+// 添加CSS动画
+const additionalStyles = `
+@keyframes letterOpenSuccess {
+    0% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.05); opacity: 0.8; }
+    100% { transform: scale(0.95); opacity: 0; }
+}
+
+@keyframes modalSlideOut {
+    from {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1);
+    }
+    to {
+        opacity: 0;
+        transform: translate(-50%, -40%) scale(0.8);
+    }
+}
+
+@keyframes notificationSlideIn {
+    from {
+        opacity: 0;
+        transform: translateX(100%);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes notificationSlideOut {
+    from {
+        opacity: 1;
+        transform: translateX(0);
+    }
+    to {
+        opacity: 0;
+        transform: translateX(100%);
+    }
+}
+`;
+
+const styleSheet = document.createElement('style');
+styleSheet.textContent = additionalStyles;
+document.head.appendChild(styleSheet);
 </script>
 {% endblock %}

@@ -3,81 +3,145 @@
 {% block title %}假象回廊 - 归途的光{% endblock %}
 
 {% block content %}
-<div class="card">
-    <h2 style="text-align: center; margin-bottom: 30px; color: #ffd700;">假象回廊</h2>
+<div class="card gallery-main-card">
+    <h2 style="text-align: center; margin-bottom: 30px; color: #ffd700; position: relative;">
+        假象回廊
+        <span class="gallery-decoration"></span>
+    </h2>
     
-    <div class="poetry">
-        "请迷恋我 一身假象"<br>
-        "天一亮 我们又人模狗样"<br>
-        "在这里，做24小时的真实自己"
+    <div class="poetry enhanced-gallery-poetry">
+        <span class="poetry-line">"请迷恋我 一身假象"</span><br>
+        <span class="poetry-line" style="animation-delay: 1s;">"天一亮 我们又人模狗样"</span><br>
+        <span class="poetry-line" style="animation-delay: 2s;">"在这里，做24小时的真实自己"</span>
     </div>
     
     {% if not identity_token %}
-    <div style="text-align: center; margin: 30px 0;">
-        <p style="margin-bottom: 20px; font-size: 1.1rem;">
-            创建一个临时的匿名身份，在接下来的24小时内，你可以自由表达内心的声音。
-        </p>
-        <button onclick="createIdentity()" class="btn">创建假象身份</button>
+    <div class="identity-creation">
+        <div class="identity-prompt">
+            <p>创建一个临时的匿名身份，在接下来的24小时内，你可以自由表达内心的声音。</p>
+            <div class="identity-features">
+                <div class="feature-tag">🎭 完全匿名</div>
+                <div class="feature-tag">⏰ 24小时体验</div>
+                <div class="feature-tag">💫 真实表达</div>
+            </div>
+        </div>
+        <button onclick="createIdentity()" class="btn create-identity-btn">
+            <span class="btn-icon">🌟</span>
+            <span class="btn-text">创建假象身份</span>
+            <div class="btn-glow"></div>
+        </button>
     </div>
     {% else %}
-    <div style="background: rgba(255, 215, 0, 0.1); padding: 20px; border-radius: 10px; margin-bottom: 30px; border-left: 4px solid #ffd700;">
-        <p><strong>你的假象身份已创建</strong></p>
-        <p>剩余时间: <span id="timeRemaining">{{ time_remaining }}</span></p>
-        <small style="opacity: 0.7;">身份将在24小时后自动消失</small>
+    <div class="identity-status">
+        <div class="status-header">
+            <span class="status-icon">🎭</span>
+            <strong>你的假象身份已创建</strong>
+        </div>
+        <div class="time-remaining-container">
+            <span class="time-label">剩余时间:</span>
+            <span id="timeRemaining" class="time-value">{{ time_remaining }}</span>
+            <div class="time-progress">
+                <div class="time-progress-bar" id="timeProgressBar"></div>
+            </div>
+        </div>
+        <small class="identity-note">身份将在24小时后自动消失，珍惜这段真实的时光</small>
     </div>
     
-    <form id="contentForm" method="post" action="/facade-gallery/create-content">
+    <form id="contentForm" method="post" action="/facade-gallery/create-content" class="enhanced-content-form">
         <input type="hidden" name="identity_token" value="{{ identity_token }}">
         
-        <div class="form-group">
-            <label for="contentText">分享你的心绪</label>
-            <textarea id="contentText" name="content_text" rows="6" placeholder="记录当下的心绪、观察或感悟..." maxlength="1000"></textarea>
-            <small style="color: rgba(240, 240, 240, 0.6);">还可以输入 <span id="charCount">1000</span> 个字符</small>
+        <div class="form-group content-form-group">
+            <label for="contentText" class="content-label">
+                <span class="label-icon">💭</span>
+                分享你的心绪
+            </label>
+            <textarea id="contentText" name="content_text" rows="6" placeholder="记录当下的心绪、观察或感悟..." maxlength="1000" class="enhanced-content-textarea"></textarea>
+            <div class="content-counter">
+                <small>还可以输入 <span id="charCount" class="char-count">1000</span> 个字符</small>
+                <div class="char-progress">
+                    <div class="char-progress-bar" id="charProgressBar"></div>
+                </div>
+            </div>
         </div>
         
-        <div style="text-align: center; margin-top: 20px;">
-            <button type="submit" class="btn">发布到回廊</button>
+        <div class="form-submit">
+            <button type="submit" class="btn enhanced-publish-btn">
+                <span class="btn-icon">✨</span>
+                <span class="btn-text">发布到回廊</span>
+                <span class="btn-loading">
+                    <span class="loading-dot"></span>
+                    <span class="loading-dot"></span>
+                    <span class="loading-dot"></span>
+                </span>
+            </button>
         </div>
     </form>
     {% endif %}
 </div>
 
-<div class="card">
-    <h3 style="color: #ffd700; margin-bottom: 20px; text-align: center;">回廊漫步</h3>
-    <p style="text-align: center; margin-bottom: 30px; opacity: 0.8;">
+<div class="card gallery-contents-card">
+    <h3 style="color: #ffd700; margin-bottom: 20px; text-align: center; position: relative;">
+        回廊漫步
+        <span class="content-count-badge">{{ contents|length if contents else 0 }} 条心绪</span>
+    </h3>
+    <p class="gallery-subtitle">
         "攒违心的鼓掌" - 在这里，每个声音都值得被听见
     </p>
     
-    <div id="galleryContents">
+    <div id="galleryContents" class="gallery-grid">
         {% if contents %}
             {% for content in contents %}
-            <div class="content-item" style="background: rgba(255, 255, 255, 0.05); padding: 25px; margin-bottom: 20px; border-radius: 10px; border-left: 4px solid #ffed4e;">
-                <div class="content-text" style="margin-bottom: 15px; line-height: 1.6;">
-                    {{ content.content_text }}
+            <div class="content-item" data-content-id="{{ content.id }}" style="animation-delay: {{ loop.index0 * 0.1 }}s;">
+                <div class="content-header">
+                    <div class="content-meta-info">
+                        <span class="content-time">{{ content.created_at.strftime('%m-%d %H:%M') }}</span>
+                        <span class="content-remaining">剩余: {{ content.time_remaining }}</span>
+                    </div>
+                    <div class="content-mood-indicator"></div>
                 </div>
                 
-                <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.9rem; opacity: 0.7;">
-                    <div>
-                        <span>{{ content.created_at.strftime('%m-%d %H:%M') }}</span>
-                        <span style="margin-left: 15px;">剩余: {{ content.time_remaining }}</span>
+                <div class="content-text-wrapper">
+                    <div class="content-text">{{ content.content_text }}</div>
+                </div>
+                
+                <div class="content-footer">
+                    <div class="applause-section">
+                        <span class="applause-count">👏 {{ content.applause_count }}</span>
+                        <button onclick="applaud({{ content.id }}, this)" class="applause-btn enhanced-applause-btn">
+                            <span class="applause-icon">👏</span>
+                            <span class="applause-text">鼓掌</span>
+                            <div class="applause-ripple"></div>
+                        </button>
                     </div>
-                    
-                    <div style="display: flex; align-items: center; gap: 10px;">
-                        <span>👏 {{ content.applause_count }}</span>
-                        <button onclick="applaud({{ content.id }}, this)" class="applause-btn" style="background: none; border: 1px solid rgba(255, 255, 255, 0.3); color: #f0f0f0; padding: 5px 12px; border-radius: 15px; cursor: pointer; font-size: 0.8rem; transition: all 0.3s ease;">
-                            鼓掌
+                    <div class="content-actions">
+                        <button class="content-action-btn" onclick="shareContent({{ content.id }})">
+                            <span>💫</span>
                         </button>
                     </div>
                 </div>
             </div>
             {% endfor %}
         {% else %}
-            <p style="text-align: center; opacity: 0.7;">回廊中还没有内容，成为第一个分享者吧</p>
+            <div class="empty-gallery-state">
+                <div class="empty-animation">
+                    <div class="empty-icon">🌸</div>
+                    <div class="floating-particles">
+                        <span class="particle">✨</span>
+                        <span class="particle">💫</span>
+                        <span class="particle">🌟</span>
+                    </div>
+                </div>
+                <p>回廊中还没有内容</p>
+                <small>成为第一个分享者，在这里留下你的足迹</small>
+            </div>
         {% endif %}
     </div>
     
-    <div style="text-align: center; margin-top: 30px;">
-        <button onclick="loadMoreContents(this)" class="btn" style="background: rgba(255, 255, 255, 0.1); color: #f0f0f0;">加载更多</button>
+    <div class="load-more-section">
+        <button onclick="loadMoreContents(this)" class="btn load-more-btn">
+            <span class="btn-icon">🔄</span>
+            <span class="btn-text">加载更多</span>
+        </button>
     </div>
 </div>
 
@@ -85,29 +149,673 @@
 
 {% block extra_css %}
 <style>
-.applause-btn:hover {
-    background: rgba(255, 215, 0, 0.2) !important;
-    border-color: #ffd700 !important;
-    transform: scale(1.05);
+/* 画廊主卡片 */
+.gallery-main-card {
+    position: relative;
+    overflow: visible;
 }
 
-.content-item {
-    transition: all 0.3s ease;
+.gallery-decoration {
+    position: absolute;
+    bottom: -8px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 80px;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, #ffd700, #ffed4e, #ffd700, transparent);
+    animation: galleryGlow 3s ease-in-out infinite;
 }
 
-.content-item:hover {
-    background: rgba(255, 255, 255, 0.08) !important;
+@keyframes galleryGlow {
+    0%, 100% { opacity: 0.6; width: 60px; }
+    50% { opacity: 1; width: 100px; }
+}
+
+.enhanced-gallery-poetry {
+    background: linear-gradient(135deg, rgba(255, 215, 0, 0.08), rgba(255, 237, 78, 0.03));
+    border: 1px solid rgba(255, 215, 0, 0.2);
+    position: relative;
+    overflow: hidden;
+}
+
+.enhanced-gallery-poetry::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 215, 0, 0.1), transparent);
+    animation: poetryShimmer 4s ease-in-out infinite;
+}
+
+@keyframes poetryShimmer {
+    0% { left: -100%; }
+    100% { left: 100%; }
+}
+
+.poetry-line {
+    display: inline-block;
+    opacity: 0;
+    animation: fadeInPoetry 1.2s ease-out forwards;
+}
+
+@keyframes fadeInPoetry {
+    from {
+        opacity: 0;
+        transform: translateY(15px) scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+/* 身份创建区域 */
+.identity-creation {
+    text-align: center;
+    margin: 30px 0;
+    padding: 30px;
+    background: linear-gradient(135deg, rgba(255, 215, 0, 0.05), rgba(255, 237, 78, 0.02));
+    border-radius: 20px;
+    border: 1px solid rgba(255, 215, 0, 0.1);
+}
+
+.identity-prompt p {
+    font-size: 1.1rem;
+    margin-bottom: 25px;
+    line-height: 1.6;
+}
+
+.identity-features {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin-bottom: 30px;
+    flex-wrap: wrap;
+}
+
+.feature-tag {
+    background: rgba(255, 215, 0, 0.15);
+    color: #ffd700;
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    border: 1px solid rgba(255, 215, 0, 0.3);
+    animation: tagFloat 3s ease-in-out infinite;
+}
+
+.feature-tag:nth-child(1) { animation-delay: 0s; }
+.feature-tag:nth-child(2) { animation-delay: 0.5s; }
+.feature-tag:nth-child(3) { animation-delay: 1s; }
+
+@keyframes tagFloat {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-5px); }
+}
+
+.create-identity-btn {
+    position: relative;
+    overflow: hidden;
+    font-size: 1.1rem;
+    padding: 15px 30px;
+}
+
+.btn-glow {
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+    animation: btnGlowSweep 2s ease-in-out infinite;
+}
+
+@keyframes btnGlowSweep {
+    0% { left: -100%; }
+    100% { left: 100%; }
+}
+
+/* 身份状态区域 */
+.identity-status {
+    background: linear-gradient(135deg, rgba(255, 215, 0, 0.1), rgba(255, 237, 78, 0.05));
+    padding: 25px;
+    border-radius: 15px;
+    margin-bottom: 30px;
+    border-left: 4px solid #ffd700;
+    position: relative;
+    overflow: hidden;
+}
+
+.identity-status::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 100px;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 215, 0, 0.05));
+    animation: statusGlow 3s ease-in-out infinite;
+}
+
+@keyframes statusGlow {
+    0%, 100% { opacity: 0.5; }
+    50% { opacity: 1; }
+}
+
+.status-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.status-icon {
+    font-size: 1.5rem;
+    margin-right: 10px;
+    animation: iconRotate 4s ease-in-out infinite;
+}
+
+@keyframes iconRotate {
+    0%, 100% { transform: rotate(0deg); }
+    25% { transform: rotate(-5deg); }
+    75% { transform: rotate(5deg); }
+}
+
+.time-remaining-container {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 10px;
+}
+
+.time-label {
+    color: #ffed4e;
+    font-weight: bold;
+}
+
+.time-value {
+    color: #ffd700;
+    font-weight: bold;
+    font-size: 1.1rem;
+}
+
+.time-progress {
+    flex: 1;
+    height: 6px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 3px;
+    overflow: hidden;
+}
+
+.time-progress-bar {
+    height: 100%;
+    background: linear-gradient(90deg, #f87171, #ffd700, #4ade80);
+    width: 75%;
+    border-radius: 3px;
+    animation: timeProgress 2s ease-in-out infinite;
+}
+
+@keyframes timeProgress {
+    0%, 100% { opacity: 0.8; }
+    50% { opacity: 1; }
+}
+
+.identity-note {
+    color: rgba(255, 215, 0, 0.8);
+    font-style: italic;
+}
+
+/* 增强的内容表单 */
+.enhanced-content-form {
+    animation: formSlideIn 0.8s ease-out;
+}
+
+@keyframes formSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.content-form-group {
+    margin-bottom: 25px;
+}
+
+.content-label {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+    font-weight: bold;
+    color: #ffed4e;
+    font-size: 1.1rem;
+}
+
+.enhanced-content-textarea {
+    width: 100%;
+    padding: 18px;
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    border-radius: 15px;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    color: #f0f0f0;
+    font-size: 1rem;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    resize: vertical;
+    line-height: 1.6;
+}
+
+.enhanced-content-textarea:focus {
+    outline: none;
+    border-color: #ffd700;
+    background: rgba(255, 255, 255, 0.15);
+    box-shadow: 
+        0 0 20px rgba(255, 215, 0, 0.3),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1);
     transform: translateY(-2px);
 }
 
-@keyframes applauseAnimation {
-    0% { transform: scale(1); }
-    50% { transform: scale(1.2); }
-    100% { transform: scale(1); }
+.content-counter {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 10px;
 }
 
-.applause-animation {
-    animation: applauseAnimation 0.3s ease;
+.enhanced-publish-btn {
+    position: relative;
+    overflow: hidden;
+    min-width: 160px;
+    font-size: 1.1rem;
+}
+
+.enhanced-publish-btn .btn-loading {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    display: none;
+}
+
+.enhanced-publish-btn.loading .btn-text,
+.enhanced-publish-btn.loading .btn-icon {
+    opacity: 0;
+}
+
+.enhanced-publish-btn.loading .btn-loading {
+    display: flex;
+    gap: 4px;
+}
+
+/* 画廊内容区域 */
+.gallery-contents-card {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.08), rgba(255, 215, 0, 0.02));
+}
+
+.content-count-badge {
+    position: absolute;
+    right: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(255, 215, 0, 0.2);
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    border: 1px solid rgba(255, 215, 0, 0.3);
+    animation: badgePulse 3s ease-in-out infinite;
+}
+
+@keyframes badgePulse {
+    0%, 100% { transform: translateY(-50%) scale(1); }
+    50% { transform: translateY(-50%) scale(1.05); }
+}
+
+.gallery-subtitle {
+    text-align: center;
+    margin-bottom: 30px;
+    opacity: 0.9;
+    font-style: italic;
+    font-size: 1rem;
+    color: rgba(255, 215, 0, 0.8);
+}
+
+.gallery-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
+    margin-bottom: 30px;
+}
+
+.content-item {
+    background: rgba(255, 255, 255, 0.05);
+    padding: 25px;
+    border-radius: 15px;
+    border-left: 4px solid #ffed4e;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    position: relative;
+    overflow: hidden;
+    opacity: 0;
+    animation: contentSlideIn 0.6s ease-out forwards;
+}
+
+@keyframes contentSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(30px) scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+.content-item::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(45deg, transparent, rgba(255, 215, 0, 0.03), transparent);
+    transform: translateX(-100%);
+    transition: transform 0.8s ease;
+}
+
+.content-item:hover::before {
+    transform: translateX(100%);
+}
+
+.content-item:hover {
+    background: rgba(255, 255, 255, 0.08);
+    transform: translateY(-5px) scale(1.02);
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
+    border-left-color: #ffd700;
+}
+
+.content-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.content-meta-info {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.content-time {
+    color: #ffed4e;
+    font-weight: bold;
+    font-size: 0.9rem;
+}
+
+.content-remaining {
+    color: rgba(240, 240, 240, 0.7);
+    font-size: 0.8rem;
+}
+
+.content-mood-indicator {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: linear-gradient(45deg, #ffd700, #ffed4e);
+    animation: moodPulse 2s ease-in-out infinite;
+}
+
+@keyframes moodPulse {
+    0%, 100% { opacity: 0.6; transform: scale(1); }
+    50% { opacity: 1; transform: scale(1.2); }
+}
+
+.content-text-wrapper {
+    margin-bottom: 20px;
+}
+
+.content-text {
+    line-height: 1.8;
+    font-size: 1rem;
+    color: #f0f0f0;
+    word-wrap: break-word;
+}
+
+.content-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    padding-top: 15px;
+}
+
+.applause-section {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.applause-count {
+    font-weight: bold;
+    color: #ffd700;
+}
+
+.enhanced-applause-btn {
+    background: none;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    color: #f0f0f0;
+    padding: 8px 16px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.enhanced-applause-btn:hover {
+    background: rgba(255, 215, 0, 0.2);
+    border-color: #ffd700;
+    color: #ffd700;
+    transform: scale(1.05);
+}
+
+.applause-ripple {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: rgba(255, 215, 0, 0.3);
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+}
+
+.enhanced-applause-btn.applauding .applause-ripple {
+    animation: applauseRipple 0.6s ease-out;
+}
+
+@keyframes applauseRipple {
+    0% {
+        width: 0;
+        height: 0;
+        opacity: 1;
+    }
+    100% {
+        width: 100px;
+        height: 100px;
+        opacity: 0;
+    }
+}
+
+.content-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.content-action-btn {
+    background: none;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: rgba(255, 255, 255, 0.6);
+    padding: 8px;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    width: 35px;
+    height: 35px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.content-action-btn:hover {
+    border-color: #ffd700;
+    color: #ffd700;
+    transform: rotate(15deg) scale(1.1);
+}
+
+/* 空状态 */
+.empty-gallery-state {
+    text-align: center;
+    padding: 80px 20px;
+    opacity: 0.8;
+}
+
+.empty-animation {
+    position: relative;
+    margin-bottom: 30px;
+}
+
+.empty-icon {
+    font-size: 5rem;
+    animation: emptyFloat 4s ease-in-out infinite;
+}
+
+@keyframes emptyFloat {
+    0%, 100% { transform: translateY(0) rotate(0deg); }
+    25% { transform: translateY(-15px) rotate(-5deg); }
+    75% { transform: translateY(-5px) rotate(5deg); }
+}
+
+.floating-particles {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 200px;
+    height: 200px;
+    pointer-events: none;
+}
+
+.particle {
+    position: absolute;
+    font-size: 1.5rem;
+    animation: particleFloat 6s ease-in-out infinite;
+}
+
+.particle:nth-child(1) {
+    top: 20%;
+    left: 20%;
+    animation-delay: 0s;
+}
+
+.particle:nth-child(2) {
+    top: 60%;
+    right: 20%;
+    animation-delay: 2s;
+}
+
+.particle:nth-child(3) {
+    bottom: 20%;
+    left: 60%;
+    animation-delay: 4s;
+}
+
+@keyframes particleFloat {
+    0%, 100% { 
+        opacity: 0.3;
+        transform: translateY(0) scale(0.8);
+    }
+    50% { 
+        opacity: 0.8;
+        transform: translateY(-20px) scale(1.2);
+    }
+}
+
+/* 加载更多区域 */
+.load-more-section {
+    text-align: center;
+    margin-top: 40px;
+}
+
+.load-more-btn {
+    background: rgba(255, 255, 255, 0.1);
+    color: #f0f0f0;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    position: relative;
+    overflow: hidden;
+}
+
+.load-more-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 215, 0, 0.2), transparent);
+    transition: left 0.6s;
+}
+
+.load-more-btn:hover::before {
+    left: 100%;
+}
+
+.load-more-btn:hover {
+    background: rgba(255, 215, 0, 0.15);
+    border-color: #ffd700;
+    color: #ffd700;
+}
+
+@media (max-width: 768px) {
+    .gallery-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .content-count-badge {
+        position: static;
+        transform: none;
+        margin-left: 10px;
+        display: inline-block;
+    }
+    
+    .identity-features {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .time-remaining-container {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+    
+    .content-footer {
+        flex-direction: column;
+        gap: 15px;
+        align-items: flex-start;
+    }
+    
+    .applause-section {
+        width: 100%;
+        justify-content: space-between;
+    }
 }
 </style>
 {% endblock %}
@@ -116,40 +824,96 @@
 <script>
 let currentOffset = {{ contents|length if contents else 0 }};
 
-// 字符计数
+// 增强的字符计数功能
 document.getElementById('contentText')?.addEventListener('input', function() {
     const maxLength = 1000;
     const currentLength = this.value.length;
     const remaining = maxLength - currentLength;
+    const percentage = (currentLength / maxLength) * 100;
+    
     document.getElementById('charCount').textContent = remaining;
+    document.getElementById('charProgressBar').style.width = percentage + '%';
+    
+    const charCountElement = document.getElementById('charCount');
+    const progressBar = document.getElementById('charProgressBar');
     
     if (remaining < 50) {
-        document.getElementById('charCount').style.color = '#ff6b6b';
+        charCountElement.style.color = '#f87171';
+        progressBar.style.background = '#f87171';
+    } else if (remaining < 200) {
+        charCountElement.style.color = '#ffd700';
+        progressBar.style.background = '#ffd700';
     } else {
-        document.getElementById('charCount').style.color = 'rgba(240, 240, 240, 0.6)';
+        charCountElement.style.color = 'rgba(240, 240, 240, 0.6)';
+        progressBar.style.background = 'linear-gradient(90deg, #4ade80, #ffd700, #f87171)';
     }
+});
+
+// 增强的表单提交
+document.getElementById('contentForm')?.addEventListener('submit', function() {
+    const submitBtn = this.querySelector('.enhanced-publish-btn');
+    submitBtn.classList.add('loading');
+    submitBtn.disabled = true;
+    
+    // 如果提交失败，重置按钮状态
+    setTimeout(() => {
+        submitBtn.classList.remove('loading');
+        submitBtn.disabled = false;
+    }, 5000);
 });
 
 // 创建假象身份
 async function createIdentity() {
+    const btn = document.querySelector('.create-identity-btn');
+    const originalContent = btn.innerHTML;
+    
+    // 添加加载状态
+    btn.innerHTML = '<span class="btn-icon">⏳</span><span class="btn-text">正在创建...</span>';
+    btn.disabled = true;
+    
     try {
         const response = await fetch('/facade-gallery/create-identity', {
             method: 'POST'
         });
         
         if (response.ok) {
-            location.reload();
+            // 添加成功动画
+            btn.innerHTML = '<span class="btn-icon">✨</span><span class="btn-text">创建成功！</span>';
+            btn.style.background = 'linear-gradient(45deg, #4ade80, #22c55e)';
+            
+            setTimeout(() => {
+                location.reload();
+            }, 1000);
         } else {
             const error = await response.json();
-            alert('创建身份失败: ' + error.detail);
+            showNotification('创建身份失败: ' + error.detail, 'error');
+            btn.innerHTML = originalContent;
+            btn.disabled = false;
         }
     } catch (error) {
-        alert('创建身份失败: ' + error.message);
+        showNotification('创建身份失败: ' + error.message, 'error');
+        btn.innerHTML = originalContent;
+        btn.disabled = false;
     }
 }
 
-// 鼓掌
+// 增强的鼓掌功能
 async function applaud(contentId, buttonElement) {
+    // 防止重复点击
+    if (buttonElement.disabled) return;
+    
+    const originalContent = buttonElement.innerHTML;
+    buttonElement.disabled = true;
+    buttonElement.classList.add('applauding');
+    
+    // 添加涟漪效果
+    const ripple = buttonElement.querySelector('.applause-ripple');
+    if (ripple) {
+        ripple.style.animation = 'none';
+        ripple.offsetHeight; // 触发重绘
+        ripple.style.animation = 'applauseRipple 0.6s ease-out';
+    }
+    
     try {
         const response = await fetch(`/facade-gallery/applaud/${contentId}`, {
             method: 'POST'
@@ -157,38 +921,116 @@ async function applaud(contentId, buttonElement) {
         
         if (response.ok) {
             const data = await response.json();
+            
             // 更新鼓掌数
             const contentItem = buttonElement.closest('.content-item');
-            const applauseSpan = contentItem.querySelector('span');
+            const applauseSpan = contentItem.querySelector('.applause-count');
             applauseSpan.textContent = `👏 ${data.applause_count}`;
             
-            // 添加动画效果
-            buttonElement.classList.add('applause-animation');
-            setTimeout(() => {
-                buttonElement.classList.remove('applause-animation');
-            }, 300);
+            // 添加成功动画
+            applauseSpan.style.animation = 'applauseCountBounce 0.6s ease-out';
             
-            // 禁用按钮
-            buttonElement.disabled = true;
-            buttonElement.textContent = '已鼓掌';
-            buttonElement.style.opacity = '0.5';
+            // 更新按钮状态
+            buttonElement.innerHTML = '<span class="applause-icon">✨</span><span class="applause-text">已鼓掌</span>';
+            buttonElement.style.background = 'rgba(255, 215, 0, 0.3)';
+            buttonElement.style.borderColor = '#ffd700';
+            buttonElement.style.color = '#1e3c72';
+            
+            // 添加粒子效果
+            createApplauseParticles(buttonElement);
+            
         } else {
             const error = await response.json();
             if (error.detail.includes('已经鼓掌')) {
-                buttonElement.disabled = true;
-                buttonElement.textContent = '已鼓掌';
-                buttonElement.style.opacity = '0.5';
+                buttonElement.innerHTML = '<span class="applause-icon">✨</span><span class="applause-text">已鼓掌</span>';
+                buttonElement.style.background = 'rgba(255, 215, 0, 0.3)';
+                buttonElement.style.borderColor = '#ffd700';
+                buttonElement.style.color = '#1e3c72';
             } else {
-                alert('鼓掌失败: ' + error.detail);
+                showNotification('鼓掌失败: ' + error.detail, 'error');
+                buttonElement.innerHTML = originalContent;
+                buttonElement.disabled = false;
             }
         }
     } catch (error) {
-        alert('鼓掌失败: ' + error.message);
+        showNotification('鼓掌失败: ' + error.message, 'error');
+        buttonElement.innerHTML = originalContent;
+        buttonElement.disabled = false;
+    } finally {
+        setTimeout(() => {
+            buttonElement.classList.remove('applauding');
+        }, 600);
+    }
+}
+
+// 创建鼓掌粒子效果
+function createApplauseParticles(buttonElement) {
+    const particleCount = 8;
+    const buttonRect = buttonElement.getBoundingClientRect();
+    
+    for (let i = 0; i < particleCount; i++) {
+        const particle = document.createElement('div');
+        particle.style.cssText = `
+            position: fixed;
+            top: ${buttonRect.top + buttonRect.height / 2}px;
+            left: ${buttonRect.left + buttonRect.width / 2}px;
+            width: 6px;
+            height: 6px;
+            background: #ffd700;
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 10000;
+            animation: applauseParticle 1s ease-out forwards;
+        `;
+        
+        // 随机方向
+        const angle = (360 / particleCount) * i;
+        const distance = 50 + Math.random() * 30;
+        const endX = Math.cos(angle * Math.PI / 180) * distance;
+        const endY = Math.sin(angle * Math.PI / 180) * distance;
+        
+        particle.style.setProperty('--endX', endX + 'px');
+        particle.style.setProperty('--endY', endY + 'px');
+        
+        document.body.appendChild(particle);
+        
+        setTimeout(() => {
+            if (particle.parentNode) {
+                particle.parentNode.removeChild(particle);
+            }
+        }, 1000);
+    }
+}
+
+// 分享内容功能
+function shareContent(contentId) {
+    const contentItem = document.querySelector(`[data-content-id="${contentId}"]`);
+    const contentText = contentItem.querySelector('.content-text').textContent;
+    
+    if (navigator.share) {
+        navigator.share({
+            title: '来自假象回廊的心绪',
+            text: contentText,
+            url: window.location.href
+        }).catch(err => {
+            console.log('分享失败:', err);
+        });
+    } else {
+        // 复制到剪贴板
+        navigator.clipboard.writeText(contentText).then(() => {
+            showNotification('内容已复制到剪贴板', 'success');
+        }).catch(() => {
+            showNotification('复制失败', 'error');
+        });
     }
 }
 
 // 加载更多内容
 async function loadMoreContents(buttonElement) {
+    const originalContent = buttonElement.innerHTML;
+    buttonElement.innerHTML = '<span class="btn-icon">⏳</span><span class="btn-text">加载中...</span>';
+    buttonElement.disabled = true;
+    
     try {
         const response = await fetch(`/facade-gallery/contents?offset=${currentOffset}&limit=10`);
         
@@ -197,48 +1039,236 @@ async function loadMoreContents(buttonElement) {
             if (data.contents && data.contents.length > 0) {
                 const galleryContents = document.getElementById('galleryContents');
                 
-                data.contents.forEach(content => {
-                    const contentHtml = `
-                        <div class="content-item" style="background: rgba(255, 255, 255, 0.05); padding: 25px; margin-bottom: 20px; border-radius: 10px; border-left: 4px solid #ffed4e;">
-                            <div class="content-text" style="margin-bottom: 15px; line-height: 1.6;">
-                                ${content.content_text}
-                            </div>
-                            
-                            <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.9rem; opacity: 0.7;">
-                                <div>
-                                    <span>${new Date(content.created_at).toLocaleDateString('zh-CN', {month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit'})}</span>
-                                    <span style="margin-left: 15px;">剩余: ${content.time_remaining}</span>
-                                </div>
-                                
-                                <div style="display: flex; align-items: center; gap: 10px;">
-                                    <span>👏 ${content.applause_count}</span>
-                                    <button onclick="applaud(${content.id}, this)" class="applause-btn" style="background: none; border: 1px solid rgba(255, 255, 255, 0.3); color: #f0f0f0; padding: 5px 12px; border-radius: 15px; cursor: pointer; font-size: 0.8rem; transition: all 0.3s ease;">
-                                        鼓掌
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    `;
-                    galleryContents.insertAdjacentHTML('beforeend', contentHtml);
+                data.contents.forEach((content, index) => {
+                    const contentElement = createContentElement(content, currentOffset + index);
+                    galleryContents.appendChild(contentElement);
+                    
+                    // 添加延迟动画
+                    setTimeout(() => {
+                        contentElement.style.opacity = '1';
+                        contentElement.style.animation = 'contentSlideIn 0.6s ease-out forwards';
+                    }, index * 100);
                 });
                 
                 currentOffset += data.contents.length;
+                buttonElement.innerHTML = originalContent;
+                buttonElement.disabled = false;
+                
+                // 更新内容计数
+                const countBadge = document.querySelector('.content-count-badge');
+                if (countBadge) {
+                    const currentCount = parseInt(countBadge.textContent.match(/\d+/)[0]);
+                    countBadge.textContent = `${currentCount + data.contents.length} 条心绪`;
+                }
             } else {
-                buttonElement.textContent = '没有更多内容了';
+                buttonElement.innerHTML = '<span class="btn-icon">🌟</span><span class="btn-text">没有更多了</span>';
                 buttonElement.disabled = true;
+                buttonElement.style.opacity = '0.6';
             }
         }
     } catch (error) {
-        alert('加载失败: ' + error.message);
+        showNotification('加载失败: ' + error.message, 'error');
+        buttonElement.innerHTML = originalContent;
+        buttonElement.disabled = false;
     }
+}
+
+// 创建内容元素
+function createContentElement(content, index) {
+    const contentElement = document.createElement('div');
+    contentElement.className = 'content-item';
+    contentElement.setAttribute('data-content-id', content.id);
+    contentElement.style.animationDelay = `${index * 0.1}s`;
+    contentElement.style.opacity = '0';
+    
+    contentElement.innerHTML = `
+        <div class="content-header">
+            <div class="content-meta-info">
+                <span class="content-time">${formatDate(content.created_at)}</span>
+                <span class="content-remaining">剩余: ${content.time_remaining}</span>
+            </div>
+            <div class="content-mood-indicator"></div>
+        </div>
+        
+        <div class="content-text-wrapper">
+            <div class="content-text">${content.content_text}</div>
+        </div>
+        
+        <div class="content-footer">
+            <div class="applause-section">
+                <span class="applause-count">👏 ${content.applause_count}</span>
+                <button onclick="applaud(${content.id}, this)" class="applause-btn enhanced-applause-btn">
+                    <span class="applause-icon">👏</span>
+                    <span class="applause-text">鼓掌</span>
+                    <div class="applause-ripple"></div>
+                </button>
+            </div>
+            <div class="content-actions">
+                <button class="content-action-btn" onclick="shareContent(${content.id})">
+                    <span>💫</span>
+                </button>
+            </div>
+        </div>
+    `;
+    
+    return contentElement;
+}
+
+// 格式化日期
+function formatDate(dateString) {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('zh-CN', {
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit'
+    });
+}
+
+// 通知系统
+function showNotification(message, type = 'info') {
+    const notification = document.createElement('div');
+    notification.className = `notification notification-${type}`;
+    
+    let bgColor, textColor;
+    switch(type) {
+        case 'error':
+            bgColor = 'rgba(248, 113, 113, 0.9)';
+            textColor = '#7f1d1d';
+            break;
+        case 'success':
+            bgColor = 'rgba(74, 222, 128, 0.9)';
+            textColor = '#14532d';
+            break;
+        default:
+            bgColor = 'rgba(255, 215, 0, 0.9)';
+            textColor = '#1e3c72';
+    }
+    
+    notification.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: ${bgColor};
+        color: ${textColor};
+        padding: 15px 20px;
+        border-radius: 10px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        backdrop-filter: blur(10px);
+        z-index: 10000;
+        animation: notificationSlideIn 0.3s ease-out;
+        max-width: 300px;
+        word-wrap: break-word;
+        font-weight: bold;
+    `;
+    notification.textContent = message;
+    
+    document.body.appendChild(notification);
+    
+    setTimeout(() => {
+        notification.style.animation = 'notificationSlideOut 0.3s ease-in';
+        setTimeout(() => {
+            if (notification.parentNode) {
+                notification.parentNode.removeChild(notification);
+            }
+        }, 300);
+    }, 3000);
 }
 
 // 更新剩余时间（如果有身份）
 {% if identity_token %}
 function updateTimeRemaining() {
-    // 这里可以添加实时更新剩余时间的逻辑
-    // 暂时省略，可以通过WebSocket或定时刷新实现
+    // 实时更新剩余时间的逻辑
+    const timeElement = document.getElementById('timeRemaining');
+    const progressBar = document.getElementById('timeProgressBar');
+    
+    if (timeElement && progressBar) {
+        // 这里可以添加实时更新逻辑
+        // 暂时保持原有显示
+    }
 }
+
+// 每分钟更新一次时间
+setInterval(updateTimeRemaining, 60000);
 {% endif %}
+
+// 添加CSS动画
+const additionalStyles = `
+@keyframes applauseCountBounce {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.3); }
+    100% { transform: scale(1); }
+}
+
+@keyframes applauseParticle {
+    0% {
+        opacity: 1;
+        transform: translate(0, 0) scale(1);
+    }
+    100% {
+        opacity: 0;
+        transform: translate(var(--endX), var(--endY)) scale(0);
+    }
+}
+
+@keyframes notificationSlideIn {
+    from {
+        opacity: 0;
+        transform: translateX(100%);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes notificationSlideOut {
+    from {
+        opacity: 1;
+        transform: translateX(0);
+    }
+    to {
+        opacity: 0;
+        transform: translateX(100%);
+    }
+}
+`;
+
+const styleSheet = document.createElement('style');
+styleSheet.textContent = additionalStyles;
+document.head.appendChild(styleSheet);
+
+// 页面加载完成后的初始化
+document.addEventListener('DOMContentLoaded', function() {
+    // 为现有内容项添加随机延迟动画
+    const contentItems = document.querySelectorAll('.content-item');
+    contentItems.forEach((item, index) => {
+        item.style.animationDelay = `${index * 0.1}s`;
+    });
+    
+    // 添加页面滚动视差效果
+    let ticking = false;
+    
+    function updateParallax() {
+        const scrolled = window.pageYOffset;
+        const parallaxElements = document.querySelectorAll('.content-mood-indicator');
+        
+        parallaxElements.forEach((element, index) => {
+            const speed = 0.5 + (index % 3) * 0.2;
+            element.style.transform = `translateY(${scrolled * speed * 0.1}px)`;
+        });
+        
+        ticking = false;
+    }
+    
+    function requestTick() {
+        if (!ticking) {
+            requestAnimationFrame(updateParallax);
+            ticking = true;
+        }
+    }
+    
+    window.addEventListener('scroll', requestTick);
+});
 </script>
 {% endblock %}

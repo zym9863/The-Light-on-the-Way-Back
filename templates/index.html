@@ -1,72 +1,284 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="card">
-    <h2 style="text-align: center; margin-bottom: 30px; color: #ffd700;">欢迎来到归途的光</h2>
+<div class="card welcome-card">
+    <h2 style="text-align: center; margin-bottom: 30px; color: #ffd700; position: relative;">
+        欢迎来到归途的光
+        <span class="glow-effect"></span>
+    </h2>
     
-    <div class="poetry" style="font-size: 1.1rem; margin: 30px 0;">
-        "请迷恋我 一身假象"<br>
-        "许便宜糕点的愿望"<br>
-        "撒闭眼前想好的谎"<br>
-        "哭一场 缓解点疯狂"
+    <div class="poetry" style="font-size: 1.1rem; margin: 30px 0; animation-delay: 0.5s;">
+        <span class="typewriter-text" data-text="请迷恋我 一身假象"></span><br>
+        <span class="typewriter-text" data-text="许便宜糕点的愿望" style="animation-delay: 2s;"></span><br>
+        <span class="typewriter-text" data-text="撒闭眼前想好的谎" style="animation-delay: 4s;"></span><br>
+        <span class="typewriter-text" data-text="哭一场 缓解点疯狂" style="animation-delay: 6s;"></span>
     </div>
     
-    <p style="text-align: center; margin: 30px 0; font-size: 1.1rem; line-height: 1.8;">
-        在这里，你可以将心中的秘密封存在时光信笺中，等待未来的自己开启；<br>
-        也可以在假象回廊中，用一个临时的身份，表达最真实的情感。
+    <p style="text-align: center; margin: 30px 0; font-size: 1.1rem; line-height: 1.8; animation: fadeInUp 1s ease-out 1s both;">
+        在这里，你可以将心中的秘密封存在<span class="highlight">时光信笺</span>中，等待未来的自己开启；<br>
+        也可以在<span class="highlight">假象回廊</span>中，用一个临时的身份，表达最真实的情感。
     </p>
 </div>
 
-<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-top: 40px;">
-    <div class="card" style="text-align: center;">
+<div class="features-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-top: 40px;">
+    <div class="card feature-card" style="text-align: center; animation-delay: 0.8s;">
+        <div class="feature-icon">📝</div>
         <h3 style="color: #ffd700; margin-bottom: 20px;">时光信笺</h3>
         <p style="margin-bottom: 25px; line-height: 1.6;">
             创建一封给未来的信，可以是独白、愿望、秘密或谎言。<br>
             在指定的日期之前，这封信将被加密封存，无人能读。
         </p>
-        <a href="/time-capsule" class="btn">写一封信</a>
+        <a href="/time-capsule" class="btn feature-btn">写一封信</a>
     </div>
     
-    <div class="card" style="text-align: center;">
+    <div class="card feature-card" style="text-align: center; animation-delay: 1s;">
+        <div class="feature-icon">🎭</div>
         <h3 style="color: #ffd700; margin-bottom: 20px;">假象回廊</h3>
         <p style="margin-bottom: 25px; line-height: 1.6;">
             创建一个24小时的匿名身份，在这里发布你的心绪、观察或感悟。<br>
             没有关注，没有追踪，只有短暂的真实表达。
         </p>
-        <a href="/facade-gallery" class="btn">进入回廊</a>
+        <a href="/facade-gallery" class="btn feature-btn">进入回廊</a>
     </div>
 </div>
 
-<div class="card" style="margin-top: 40px;">
-    <h3 style="color: #ffd700; margin-bottom: 20px; text-align: center;">使用说明</h3>
+<div class="card instructions-card" style="margin-top: 40px; animation-delay: 1.2s;">
+    <h3 style="color: #ffd700; margin-bottom: 20px; text-align: center; position: relative;">
+        使用说明
+        <span class="underline-effect"></span>
+    </h3>
     
-    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px;">
-        <div>
-            <h4 style="color: #ffed4e; margin-bottom: 15px;">时光信笺功能</h4>
-            <ul style="list-style: none; padding-left: 0;">
-                <li style="margin-bottom: 10px;">📝 创建加密的未来信件</li>
-                <li style="margin-bottom: 10px;">🔒 在指定日期前无法解密</li>
-                <li style="margin-bottom: 10px;">🌌 可选择"寄往虚空"立即销毁</li>
-                <li style="margin-bottom: 10px;">⏰ 到期自动开启</li>
+    <div class="instructions-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px;">
+        <div class="instruction-item">
+            <h4 style="color: #ffed4e; margin-bottom: 15px; display: flex; align-items: center;">
+                <span class="icon-pulse">⏰</span> 时光信笺功能
+            </h4>
+            <ul class="feature-list">
+                <li>📝 创建加密的未来信件</li>
+                <li>🔒 在指定日期前无法解密</li>
+                <li>🌌 可选择"寄往虚空"立即销毁</li>
+                <li>⏰ 到期自动开启</li>
             </ul>
         </div>
         
-        <div>
-            <h4 style="color: #ffed4e; margin-bottom: 15px;">假象回廊功能</h4>
-            <ul style="list-style: none; padding-left: 0;">
-                <li style="margin-bottom: 10px;">👤 创建24小时临时身份</li>
-                <li style="margin-bottom: 10px;">📱 发布文字或图片内容</li>
-                <li style="margin-bottom: 10px;">👏 匿名鼓掌互动</li>
-                <li style="margin-bottom: 10px;">⏳ 24小时后自动消失</li>
+        <div class="instruction-item">
+            <h4 style="color: #ffed4e; margin-bottom: 15px; display: flex; align-items: center;">
+                <span class="icon-pulse" style="animation-delay: 0.5s;">🎭</span> 假象回廊功能
+            </h4>
+            <ul class="feature-list">
+                <li>👤 创建24小时临时身份</li>
+                <li>📱 发布文字或图片内容</li>
+                <li>👏 匿名鼓掌互动</li>
+                <li>⏳ 24小时后自动消失</li>
             </ul>
         </div>
     </div>
 </div>
 
 <style>
+.welcome-card {
+    position: relative;
+    overflow: visible;
+}
+
+.glow-effect {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 100%;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, #ffd700, transparent);
+    animation: glow 2s ease-in-out infinite;
+    opacity: 0.6;
+}
+
+@keyframes glow {
+    0%, 100% { width: 0%; opacity: 0; }
+    50% { width: 100%; opacity: 0.6; }
+}
+
+.typewriter-text {
+    display: inline-block;
+    opacity: 0;
+    animation: typewriter 2s ease-out forwards;
+}
+
+@keyframes typewriter {
+    0% { 
+        opacity: 0;
+        transform: translateX(-20px);
+    }
+    50% { 
+        opacity: 0.5;
+        transform: translateX(-10px);
+    }
+    100% { 
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+.highlight {
+    color: #ffd700;
+    font-weight: bold;
+    position: relative;
+    padding: 2px 4px;
+    background: linear-gradient(45deg, rgba(255, 215, 0, 0.1), rgba(255, 237, 78, 0.1));
+    border-radius: 4px;
+    transition: all 0.3s ease;
+}
+
+.highlight:hover {
+    background: linear-gradient(45deg, rgba(255, 215, 0, 0.2), rgba(255, 237, 78, 0.2));
+    text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+}
+
+.features-grid {
+    position: relative;
+}
+
+.feature-card {
+    position: relative;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.feature-card::before {
+    content: '';
+    position: absolute;
+    top: -2px;
+    left: -2px;
+    right: -2px;
+    bottom: -2px;
+    background: linear-gradient(45deg, #ffd700, #ffed4e, #ffd700);
+    border-radius: 22px;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    z-index: -1;
+}
+
+.feature-card:hover::before {
+    opacity: 0.3;
+}
+
+.feature-card:hover {
+    transform: translateY(-8px) scale(1.02);
+}
+
+.feature-icon {
+    font-size: 3rem;
+    margin-bottom: 15px;
+    animation: bounce 2s ease-in-out infinite;
+}
+
+.feature-card:nth-child(2) .feature-icon {
+    animation-delay: 0.5s;
+}
+
+@keyframes bounce {
+    0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+    40% { transform: translateY(-10px); }
+    60% { transform: translateY(-5px); }
+}
+
+.feature-btn {
+    position: relative;
+    z-index: 1;
+}
+
+.instructions-card {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 215, 0, 0.05));
+}
+
+.underline-effect {
+    position: absolute;
+    bottom: -5px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0;
+    height: 2px;
+    background: linear-gradient(90deg, #ffd700, #ffed4e);
+    animation: underlineGrow 1s ease-out 1.5s forwards;
+}
+
+@keyframes underlineGrow {
+    from { width: 0; }
+    to { width: 80px; }
+}
+
+.instruction-item {
+    padding: 20px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 15px;
+    border: 1px solid rgba(255, 215, 0, 0.1);
+    transition: all 0.3s ease;
+}
+
+.instruction-item:hover {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(255, 215, 0, 0.2);
+    transform: translateY(-3px);
+}
+
+.icon-pulse {
+    display: inline-block;
+    animation: pulse 2s ease-in-out infinite;
+    margin-right: 10px;
+}
+
+@keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+}
+
+.feature-list {
+    list-style: none;
+    padding-left: 0;
+}
+
+.feature-list li {
+    margin-bottom: 12px;
+    padding: 8px 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    transition: all 0.3s ease;
+    opacity: 0;
+    animation: slideInLeft 0.6s ease-out forwards;
+}
+
+.feature-list li:nth-child(1) { animation-delay: 1.5s; }
+.feature-list li:nth-child(2) { animation-delay: 1.7s; }
+.feature-list li:nth-child(3) { animation-delay: 1.9s; }
+.feature-list li:nth-child(4) { animation-delay: 2.1s; }
+
+@keyframes slideInLeft {
+    from {
+        opacity: 0;
+        transform: translateX(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+.feature-list li:hover {
+    color: #ffd700;
+    padding-left: 10px;
+    border-color: rgba(255, 215, 0, 0.3);
+}
+
 @media (max-width: 768px) {
-    div[style*="grid-template-columns: 1fr 1fr"] {
+    .features-grid,
+    .instructions-grid {
         grid-template-columns: 1fr !important;
+    }
+    
+    .feature-icon {
+        font-size: 2.5rem;
+    }
+    
+    .typewriter-text {
+        font-size: 0.95rem;
     }
 }
 </style>
