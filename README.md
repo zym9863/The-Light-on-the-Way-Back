@@ -1,3 +1,5 @@
+[English](README_EN.md) | [中文](README.md)
+
 # 归途的光 - The Light on the Way Back
 
 一个诗意的情感表达平台，包含时光信笺和假象回廊两大核心功能。
