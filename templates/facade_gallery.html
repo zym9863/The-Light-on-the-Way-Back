@@ -64,7 +64,7 @@
                     
                     <div style="display: flex; align-items: center; gap: 10px;">
                         <span>👏 {{ content.applause_count }}</span>
-                        <button onclick="applaud({{ content.id }})" class="applause-btn" style="background: none; border: 1px solid rgba(255, 255, 255, 0.3); color: #f0f0f0; padding: 5px 12px; border-radius: 15px; cursor: pointer; font-size: 0.8rem; transition: all 0.3s ease;">
+                        <button onclick="applaud({{ content.id }}, this)" class="applause-btn" style="background: none; border: 1px solid rgba(255, 255, 255, 0.3); color: #f0f0f0; padding: 5px 12px; border-radius: 15px; cursor: pointer; font-size: 0.8rem; transition: all 0.3s ease;">
                             鼓掌
                         </button>
                     </div>
@@ -77,7 +77,7 @@
     </div>
     
     <div style="text-align: center; margin-top: 30px;">
-        <button onclick="loadMoreContents()" class="btn" style="background: rgba(255, 255, 255, 0.1); color: #f0f0f0;">加载更多</button>
+        <button onclick="loadMoreContents(this)" class="btn" style="background: rgba(255, 255, 255, 0.1); color: #f0f0f0;">加载更多</button>
     </div>
 </div>
 
@@ -149,7 +149,7 @@ async function createIdentity() {
 }
 
 // 鼓掌
-async function applaud(contentId) {
+async function applaud(contentId, buttonElement) {
     try {
         const response = await fetch(`/facade-gallery/applaud/${contentId}`, {
             method: 'POST'
@@ -158,26 +158,26 @@ async function applaud(contentId) {
         if (response.ok) {
             const data = await response.json();
             // 更新鼓掌数
-            const contentItem = event.target.closest('.content-item');
+            const contentItem = buttonElement.closest('.content-item');
             const applauseSpan = contentItem.querySelector('span');
             applauseSpan.textContent = `👏 ${data.applause_count}`;
             
             // 添加动画效果
-            event.target.classList.add('applause-animation');
+            buttonElement.classList.add('applause-animation');
             setTimeout(() => {
-                event.target.classList.remove('applause-animation');
+                buttonElement.classList.remove('applause-animation');
             }, 300);
             
             // 禁用按钮
-            event.target.disabled = true;
-            event.target.textContent = '已鼓掌';
-            event.target.style.opacity = '0.5';
+            buttonElement.disabled = true;
+            buttonElement.textContent = '已鼓掌';
+            buttonElement.style.opacity = '0.5';
         } else {
             const error = await response.json();
             if (error.detail.includes('已经鼓掌')) {
-                event.target.disabled = true;
-                event.target.textContent = '已鼓掌';
-                event.target.style.opacity = '0.5';
+                buttonElement.disabled = true;
+                buttonElement.textContent = '已鼓掌';
+                buttonElement.style.opacity = '0.5';
             } else {
                 alert('鼓掌失败: ' + error.detail);
             }
@@ -188,7 +188,7 @@ async function applaud(contentId) {
 }
 
 // 加载更多内容
-async function loadMoreContents() {
+async function loadMoreContents(buttonElement) {
     try {
         const response = await fetch(`/facade-gallery/contents?offset=${currentOffset}&limit=10`);
         
@@ -212,7 +212,7 @@ async function loadMoreContents() {
                                 
                                 <div style="display: flex; align-items: center; gap: 10px;">
                                     <span>👏 ${content.applause_count}</span>
-                                    <button onclick="applaud(${content.id})" class="applause-btn" style="background: none; border: 1px solid rgba(255, 255, 255, 0.3); color: #f0f0f0; padding: 5px 12px; border-radius: 15px; cursor: pointer; font-size: 0.8rem; transition: all 0.3s ease;">
+                                    <button onclick="applaud(${content.id}, this)" class="applause-btn" style="background: none; border: 1px solid rgba(255, 255, 255, 0.3); color: #f0f0f0; padding: 5px 12px; border-radius: 15px; cursor: pointer; font-size: 0.8rem; transition: all 0.3s ease;">
                                         鼓掌
                                     </button>
                                 </div>
@@ -224,8 +224,8 @@ async function loadMoreContents() {
                 
                 currentOffset += data.contents.length;
             } else {
-                event.target.textContent = '没有更多内容了';
-                event.target.disabled = true;
+                buttonElement.textContent = '没有更多内容了';
+                buttonElement.disabled = true;
             }
         }
     } catch (error) {
