@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="card">
+    <h2 style="text-align: center; margin-bottom: 30px; color: #ffd700;">欢迎来到归途的光</h2>
+    
+    <div class="poetry" style="font-size: 1.1rem; margin: 30px 0;">
+        "请迷恋我 一身假象"<br>
+        "许便宜糕点的愿望"<br>
+        "撒闭眼前想好的谎"<br>
+        "哭一场 缓解点疯狂"
+    </div>
+    
+    <p style="text-align: center; margin: 30px 0; font-size: 1.1rem; line-height: 1.8;">
+        在这里，你可以将心中的秘密封存在时光信笺中，等待未来的自己开启；<br>
+        也可以在假象回廊中，用一个临时的身份，表达最真实的情感。
+    </p>
+</div>
+
+<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-top: 40px;">
+    <div class="card" style="text-align: center;">
+        <h3 style="color: #ffd700; margin-bottom: 20px;">时光信笺</h3>
+        <p style="margin-bottom: 25px; line-height: 1.6;">
+            创建一封给未来的信，可以是独白、愿望、秘密或谎言。<br>
+            在指定的日期之前，这封信将被加密封存，无人能读。
+        </p>
+        <a href="/time-capsule" class="btn">写一封信</a>
+    </div>
+    
+    <div class="card" style="text-align: center;">
+        <h3 style="color: #ffd700; margin-bottom: 20px;">假象回廊</h3>
+        <p style="margin-bottom: 25px; line-height: 1.6;">
+            创建一个24小时的匿名身份，在这里发布你的心绪、观察或感悟。<br>
+            没有关注，没有追踪，只有短暂的真实表达。
+        </p>
+        <a href="/facade-gallery" class="btn">进入回廊</a>
+    </div>
+</div>
+
+<div class="card" style="margin-top: 40px;">
+    <h3 style="color: #ffd700; margin-bottom: 20px; text-align: center;">使用说明</h3>
+    
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px;">
+        <div>
+            <h4 style="color: #ffed4e; margin-bottom: 15px;">时光信笺功能</h4>
+            <ul style="list-style: none; padding-left: 0;">
+                <li style="margin-bottom: 10px;">📝 创建加密的未来信件</li>
+                <li style="margin-bottom: 10px;">🔒 在指定日期前无法解密</li>
+                <li style="margin-bottom: 10px;">🌌 可选择"寄往虚空"立即销毁</li>
+                <li style="margin-bottom: 10px;">⏰ 到期自动开启</li>
+            </ul>
+        </div>
+        
+        <div>
+            <h4 style="color: #ffed4e; margin-bottom: 15px;">假象回廊功能</h4>
+            <ul style="list-style: none; padding-left: 0;">
+                <li style="margin-bottom: 10px;">👤 创建24小时临时身份</li>
+                <li style="margin-bottom: 10px;">📱 发布文字或图片内容</li>
+                <li style="margin-bottom: 10px;">👏 匿名鼓掌互动</li>
+                <li style="margin-bottom: 10px;">⏳ 24小时后自动消失</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<style>
+@media (max-width: 768px) {
+    div[style*="grid-template-columns: 1fr 1fr"] {
+        grid-template-columns: 1fr !important;
+    }
+}
+</style>
+{% endblock %}

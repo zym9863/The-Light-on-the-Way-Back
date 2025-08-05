@@ -1,0 +1,244 @@
+{% extends "base.html" %}
+
+{% block title %}假象回廊 - 归途的光{% endblock %}
+
+{% block content %}
+<div class="card">
+    <h2 style="text-align: center; margin-bottom: 30px; color: #ffd700;">假象回廊</h2>
+    
+    <div class="poetry">
+        "请迷恋我 一身假象"<br>
+        "天一亮 我们又人模狗样"<br>
+        "在这里，做24小时的真实自己"
+    </div>
+    
+    {% if not identity_token %}
+    <div style="text-align: center; margin: 30px 0;">
+        <p style="margin-bottom: 20px; font-size: 1.1rem;">
+            创建一个临时的匿名身份，在接下来的24小时内，你可以自由表达内心的声音。
+        </p>
+        <button onclick="createIdentity()" class="btn">创建假象身份</button>
+    </div>
+    {% else %}
+    <div style="background: rgba(255, 215, 0, 0.1); padding: 20px; border-radius: 10px; margin-bottom: 30px; border-left: 4px solid #ffd700;">
+        <p><strong>你的假象身份已创建</strong></p>
+        <p>剩余时间: <span id="timeRemaining">{{ time_remaining }}</span></p>
+        <small style="opacity: 0.7;">身份将在24小时后自动消失</small>
+    </div>
+    
+    <form id="contentForm" method="post" action="/facade-gallery/create-content">
+        <input type="hidden" name="identity_token" value="{{ identity_token }}">
+        
+        <div class="form-group">
+            <label for="contentText">分享你的心绪</label>
+            <textarea id="contentText" name="content_text" rows="6" placeholder="记录当下的心绪、观察或感悟..." maxlength="1000"></textarea>
+            <small style="color: rgba(240, 240, 240, 0.6);">还可以输入 <span id="charCount">1000</span> 个字符</small>
+        </div>
+        
+        <div style="text-align: center; margin-top: 20px;">
+            <button type="submit" class="btn">发布到回廊</button>
+        </div>
+    </form>
+    {% endif %}
+</div>
+
+<div class="card">
+    <h3 style="color: #ffd700; margin-bottom: 20px; text-align: center;">回廊漫步</h3>
+    <p style="text-align: center; margin-bottom: 30px; opacity: 0.8;">
+        "攒违心的鼓掌" - 在这里，每个声音都值得被听见
+    </p>
+    
+    <div id="galleryContents">
+        {% if contents %}
+            {% for content in contents %}
+            <div class="content-item" style="background: rgba(255, 255, 255, 0.05); padding: 25px; margin-bottom: 20px; border-radius: 10px; border-left: 4px solid #ffed4e;">
+                <div class="content-text" style="margin-bottom: 15px; line-height: 1.6;">
+                    {{ content.content_text }}
+                </div>
+                
+                <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.9rem; opacity: 0.7;">
+                    <div>
+                        <span>{{ content.created_at.strftime('%m-%d %H:%M') }}</span>
+                        <span style="margin-left: 15px;">剩余: {{ content.time_remaining }}</span>
+                    </div>
+                    
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <span>👏 {{ content.applause_count }}</span>
+                        <button onclick="applaud({{ content.id }})" class="applause-btn" style="background: none; border: 1px solid rgba(255, 255, 255, 0.3); color: #f0f0f0; padding: 5px 12px; border-radius: 15px; cursor: pointer; font-size: 0.8rem; transition: all 0.3s ease;">
+                            鼓掌
+                        </button>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <p style="text-align: center; opacity: 0.7;">回廊中还没有内容，成为第一个分享者吧</p>
+        {% endif %}
+    </div>
+    
+    <div style="text-align: center; margin-top: 30px;">
+        <button onclick="loadMoreContents()" class="btn" style="background: rgba(255, 255, 255, 0.1); color: #f0f0f0;">加载更多</button>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.applause-btn:hover {
+    background: rgba(255, 215, 0, 0.2) !important;
+    border-color: #ffd700 !important;
+    transform: scale(1.05);
+}
+
+.content-item {
+    transition: all 0.3s ease;
+}
+
+.content-item:hover {
+    background: rgba(255, 255, 255, 0.08) !important;
+    transform: translateY(-2px);
+}
+
+@keyframes applauseAnimation {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.2); }
+    100% { transform: scale(1); }
+}
+
+.applause-animation {
+    animation: applauseAnimation 0.3s ease;
+}
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+let currentOffset = {{ contents|length if contents else 0 }};
+
+// 字符计数
+document.getElementById('contentText')?.addEventListener('input', function() {
+    const maxLength = 1000;
+    const currentLength = this.value.length;
+    const remaining = maxLength - currentLength;
+    document.getElementById('charCount').textContent = remaining;
+    
+    if (remaining < 50) {
+        document.getElementById('charCount').style.color = '#ff6b6b';
+    } else {
+        document.getElementById('charCount').style.color = 'rgba(240, 240, 240, 0.6)';
+    }
+});
+
+// 创建假象身份
+async function createIdentity() {
+    try {
+        const response = await fetch('/facade-gallery/create-identity', {
+            method: 'POST'
+        });
+        
+        if (response.ok) {
+            location.reload();
+        } else {
+            const error = await response.json();
+            alert('创建身份失败: ' + error.detail);
+        }
+    } catch (error) {
+        alert('创建身份失败: ' + error.message);
+    }
+}
+
+// 鼓掌
+async function applaud(contentId) {
+    try {
+        const response = await fetch(`/facade-gallery/applaud/${contentId}`, {
+            method: 'POST'
+        });
+        
+        if (response.ok) {
+            const data = await response.json();
+            // 更新鼓掌数
+            const contentItem = event.target.closest('.content-item');
+            const applauseSpan = contentItem.querySelector('span');
+            applauseSpan.textContent = `👏 ${data.applause_count}`;
+            
+            // 添加动画效果
+            event.target.classList.add('applause-animation');
+            setTimeout(() => {
+                event.target.classList.remove('applause-animation');
+            }, 300);
+            
+            // 禁用按钮
+            event.target.disabled = true;
+            event.target.textContent = '已鼓掌';
+            event.target.style.opacity = '0.5';
+        } else {
+            const error = await response.json();
+            if (error.detail.includes('已经鼓掌')) {
+                event.target.disabled = true;
+                event.target.textContent = '已鼓掌';
+                event.target.style.opacity = '0.5';
+            } else {
+                alert('鼓掌失败: ' + error.detail);
+            }
+        }
+    } catch (error) {
+        alert('鼓掌失败: ' + error.message);
+    }
+}
+
+// 加载更多内容
+async function loadMoreContents() {
+    try {
+        const response = await fetch(`/facade-gallery/contents?offset=${currentOffset}&limit=10`);
+        
+        if (response.ok) {
+            const data = await response.json();
+            if (data.contents && data.contents.length > 0) {
+                const galleryContents = document.getElementById('galleryContents');
+                
+                data.contents.forEach(content => {
+                    const contentHtml = `
+                        <div class="content-item" style="background: rgba(255, 255, 255, 0.05); padding: 25px; margin-bottom: 20px; border-radius: 10px; border-left: 4px solid #ffed4e;">
+                            <div class="content-text" style="margin-bottom: 15px; line-height: 1.6;">
+                                ${content.content_text}
+                            </div>
+                            
+                            <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.9rem; opacity: 0.7;">
+                                <div>
+                                    <span>${new Date(content.created_at).toLocaleDateString('zh-CN', {month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit'})}</span>
+                                    <span style="margin-left: 15px;">剩余: ${content.time_remaining}</span>
+                                </div>
+                                
+                                <div style="display: flex; align-items: center; gap: 10px;">
+                                    <span>👏 ${content.applause_count}</span>
+                                    <button onclick="applaud(${content.id})" class="applause-btn" style="background: none; border: 1px solid rgba(255, 255, 255, 0.3); color: #f0f0f0; padding: 5px 12px; border-radius: 15px; cursor: pointer; font-size: 0.8rem; transition: all 0.3s ease;">
+                                        鼓掌
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    galleryContents.insertAdjacentHTML('beforeend', contentHtml);
+                });
+                
+                currentOffset += data.contents.length;
+            } else {
+                event.target.textContent = '没有更多内容了';
+                event.target.disabled = true;
+            }
+        }
+    } catch (error) {
+        alert('加载失败: ' + error.message);
+    }
+}
+
+// 更新剩余时间（如果有身份）
+{% if identity_token %}
+function updateTimeRemaining() {
+    // 这里可以添加实时更新剩余时间的逻辑
+    // 暂时省略，可以通过WebSocket或定时刷新实现
+}
+{% endif %}
+</script>
+{% endblock %}

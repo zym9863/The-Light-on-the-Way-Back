@@ -1,0 +1,167 @@
+{% extends "base.html" %}
+
+{% block title %}时光信笺 - 归途的光{% endblock %}
+
+{% block content %}
+<div class="card">
+    <h2 style="text-align: center; margin-bottom: 30px; color: #ffd700;">时光信笺</h2>
+    
+    <div class="poetry">
+        "许便宜糕点的愿望"<br>
+        "撒闭眼前想好的谎"<br>
+        "将心事封存在时光的胶囊里"
+    </div>
+    
+    <form id="letterForm" method="post" action="/time-capsule/create">
+        <div class="form-group">
+            <label for="title">信笺标题（可选）</label>
+            <input type="text" id="title" name="title" placeholder="给这封信起个标题..." maxlength="100">
+        </div>
+        
+        <div class="form-group">
+            <label for="content">信笺内容 *</label>
+            <textarea id="content" name="content" rows="10" placeholder="写下你想对未来说的话..." required maxlength="5000"></textarea>
+            <small style="color: rgba(240, 240, 240, 0.6);">还可以输入 <span id="charCount">5000</span> 个字符</small>
+        </div>
+        
+        <div class="form-group">
+            <label for="openDate">开启日期 *</label>
+            <input type="datetime-local" id="openDate" name="open_date" required>
+            <small style="color: rgba(240, 240, 240, 0.6);">选择你希望这封信被开启的日期和时间</small>
+        </div>
+        
+        <div class="form-group">
+            <label style="display: flex; align-items: center; cursor: pointer;">
+                <input type="checkbox" id="sendToVoid" name="send_to_void" style="margin-right: 10px;">
+                寄往虚空（创建后立即销毁，作为纯粹的情感宣泄）
+            </label>
+            <small style="color: rgba(240, 240, 240, 0.6); margin-left: 25px;">
+                "哭一场 缓解点疯狂" - 选择此项后，信笺将在创建后立即被销毁
+            </small>
+        </div>
+        
+        <div style="text-align: center; margin-top: 30px;">
+            <button type="submit" class="btn">封存信笺</button>
+        </div>
+    </form>
+</div>
+
+<div class="card">
+    <h3 style="color: #ffd700; margin-bottom: 20px; text-align: center;">可开启的信笺</h3>
+    
+    <div id="openableLetters">
+        {% if openable_letters %}
+            {% for letter in openable_letters %}
+            <div class="letter-item" style="background: rgba(255, 255, 255, 0.05); padding: 20px; margin-bottom: 15px; border-radius: 10px; border-left: 4px solid #ffd700;">
+                <div style="display: flex; justify-content: between; align-items: center;">
+                    <div>
+                        <p><strong>创建时间：</strong>{{ letter.created_at.strftime('%Y-%m-%d %H:%M') }}</p>
+                        <p><strong>开启时间：</strong>{{ letter.open_at.strftime('%Y-%m-%d %H:%M') }}</p>
+                    </div>
+                    <button onclick="openLetter({{ letter.id }})" class="btn">开启信笺</button>
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <p style="text-align: center; opacity: 0.7;">暂无可开启的信笺</p>
+        {% endif %}
+    </div>
+</div>
+
+<!-- 信笺内容模态框 -->
+<div id="letterModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.8); z-index: 1000;">
+    <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%); padding: 40px; border-radius: 15px; max-width: 600px; width: 90%; max-height: 80%; overflow-y: auto;">
+        <h3 style="color: #ffd700; margin-bottom: 20px; text-align: center;">时光信笺</h3>
+        <div id="letterContent"></div>
+        <div style="text-align: center; margin-top: 30px;">
+            <button onclick="closeModal()" class="btn">关闭</button>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// 字符计数
+document.getElementById('content').addEventListener('input', function() {
+    const maxLength = 5000;
+    const currentLength = this.value.length;
+    const remaining = maxLength - currentLength;
+    document.getElementById('charCount').textContent = remaining;
+    
+    if (remaining < 100) {
+        document.getElementById('charCount').style.color = '#ff6b6b';
+    } else {
+        document.getElementById('charCount').style.color = 'rgba(240, 240, 240, 0.6)';
+    }
+});
+
+// 设置最小日期为当前时间
+document.addEventListener('DOMContentLoaded', function() {
+    const now = new Date();
+    now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+    document.getElementById('openDate').min = now.toISOString().slice(0, 16);
+});
+
+// 寄往虚空选项处理
+document.getElementById('sendToVoid').addEventListener('change', function() {
+    const openDateField = document.getElementById('openDate');
+    if (this.checked) {
+        openDateField.disabled = true;
+        openDateField.required = false;
+    } else {
+        openDateField.disabled = false;
+        openDateField.required = true;
+    }
+});
+
+// 开启信笺
+async function openLetter(letterId) {
+    try {
+        const response = await fetch(`/time-capsule/open/${letterId}`, {
+            method: 'POST'
+        });
+        
+        if (response.ok) {
+            const data = await response.json();
+            showLetterContent(data);
+        } else {
+            const error = await response.json();
+            alert('开启失败: ' + error.detail);
+        }
+    } catch (error) {
+        alert('开启失败: ' + error.message);
+    }
+}
+
+// 显示信笺内容
+function showLetterContent(data) {
+    const content = `
+        ${data.title ? `<h4 style="color: #ffed4e; margin-bottom: 15px;">${data.title}</h4>` : ''}
+        <div style="background: rgba(255, 255, 255, 0.1); padding: 20px; border-radius: 10px; margin-bottom: 20px;">
+            <pre style="white-space: pre-wrap; font-family: inherit; margin: 0;">${data.content}</pre>
+        </div>
+        <p style="text-align: center; opacity: 0.7;">
+            <small>创建于 ${new Date(data.created_at).toLocaleString()}</small><br>
+            <small>开启于 ${new Date(data.opened_at).toLocaleString()}</small>
+        </p>
+    `;
+    
+    document.getElementById('letterContent').innerHTML = content;
+    document.getElementById('letterModal').style.display = 'block';
+}
+
+// 关闭模态框
+function closeModal() {
+    document.getElementById('letterModal').style.display = 'none';
+}
+
+// 点击模态框外部关闭
+document.getElementById('letterModal').addEventListener('click', function(e) {
+    if (e.target === this) {
+        closeModal();
+    }
+});
+</script>
+{% endblock %}
